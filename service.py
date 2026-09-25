@@ -1,6 +1,6 @@
 from typing import Any
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Response
 from opentelemetry import trace
 from pydantic import BaseModel, Field
 
@@ -20,11 +20,11 @@ class StreamRequest(BaseModel):
 
 
 @app.get("/health/live")
-def live(request: Request) -> dict[str, str]:
-    request.state.response_headers = {
-        "x-request-id": request.headers.get("x-request-id", ""),
-        "x-correlation-id": request.headers.get("x-correlation-id", request.headers.get("x-request-id", "")),
-    }
+def live(request: Request, response: Response) -> dict[str, str]:
+    request_id = request.headers.get("x-request-id", "")
+    response.headers["x-request-id"] = request_id
+    response.headers["x-correlation-id"] = request.headers.get("x-correlation-id", request_id)
+    response.headers["x-latency-ms"] = "0.000"
     return {"status": "ok"}
 
 
