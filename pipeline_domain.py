@@ -29,10 +29,10 @@ class Window:
     def add(self, sample: Sample) -> None:
         if self._q and sample.timestamp < self._q[-1].timestamp:
             raise ValueError("out-of-order sample")
-        self._q.append(sample)
-        if len(self._q) > self.max_samples:
-            raise OverflowError("window capacity exceeded")
         self._evict(sample.timestamp)
+        if len(self._q) >= self.max_samples:
+            raise OverflowError("window capacity exceeded")
+        self._q.append(sample)
 
     def _evict(self, now: float) -> None:
         while self._q and now - self._q[0].timestamp > self.size_s:
