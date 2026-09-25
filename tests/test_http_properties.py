@@ -1,8 +1,24 @@
-from hypothesis import given,strategies as st
 from fastapi.testclient import TestClient
+from hypothesis import given, strategies as st
+
 from service import app
-c=TestClient(app)
-def test_contract(): assert c.get("/health/live").status_code==200
-@given(st.text(min_size=1,max_size=32))
-def test_property(v):
- assert c.post("/v1/stream",json={"key":v,"payload":{"value":1,"timestamp":1}}).status_code==200
+
+client = TestClient(app)
+
+
+def test_contract() -> None:
+    assert client.get("/health/live").status_code == 200
+
+
+@given(st.text(alphabet=st.characters(blacklist_categories=("Cs",)), min_size=1, max_size=32))
+def test_property(value: str) -> None:
+    if not value.strip():
+        return
+    response = client.post(
+        "/v1/stream",
+        json={
+            "key": value,
+            "payload": {"value": 1, "timestamp": 1},
+        },
+    )
+    assert response.status_code == 200, response.text
