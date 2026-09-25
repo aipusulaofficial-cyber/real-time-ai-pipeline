@@ -1,6 +1,6 @@
 from typing import Any
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from opentelemetry import trace
 from pydantic import BaseModel, Field
 
@@ -20,7 +20,11 @@ class StreamRequest(BaseModel):
 
 
 @app.get("/health/live")
-def live() -> dict[str, str]:
+def live(request: Request) -> dict[str, str]:
+    request.state.response_headers = {
+        "x-request-id": request.headers.get("x-request-id", ""),
+        "x-correlation-id": request.headers.get("x-correlation-id", request.headers.get("x-request-id", "")),
+    }
     return {"status": "ok"}
 
 
