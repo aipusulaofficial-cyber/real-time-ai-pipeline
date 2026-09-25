@@ -46,11 +46,11 @@ def handle(request: StreamRequest) -> dict[str, float | int | str]:
                     }
                 ]
             if not isinstance(raw_samples, list):
-                raise ValueError("samples must be a list")
+                raise TypeError("samples must be a list")
             window = Window(window_s, max_samples=max_samples)
             for raw in raw_samples:
                 if not isinstance(raw, dict):
-                    raise ValueError("each sample must be an object")
+                    raise TypeError("each sample must be an object")
                 window.add(
                     Sample(
                         key=str(raw.get("key", request.key)),
