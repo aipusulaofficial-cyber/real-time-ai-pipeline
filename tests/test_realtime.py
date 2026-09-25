@@ -1,4 +1,6 @@
-from realtime_pipeline import *
+import pytest
+
+from realtime_pipeline import Record, WindowOperator
 
 
 def test_window_aggregation():
@@ -15,7 +17,5 @@ def test_late_data_is_dropped():
 
 
 def test_invalid_window():
-    import pytest
-
     with pytest.raises(ValueError):
         WindowOperator(0)
