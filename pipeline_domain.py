@@ -1,6 +1,6 @@
+import math
 from collections import deque
 from dataclasses import dataclass
-import math
 
 
 @dataclass(frozen=True)
