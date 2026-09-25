@@ -1,0 +1,15 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: real-time-ai-pipeline}
+spec:
+ replicas: 2
+ selector: {matchLabels: {app: real-time-ai-pipeline}}
+ template:
+  metadata: {labels: {app: real-time-ai-pipeline}}
+  spec:
+   containers:
+   - name: api
+     image: real-time-ai-pipeline:latest
+     ports: [{containerPort: 8000}]
+     readinessProbe: {httpGet: {path: /health/ready, port: 8000}}
+     livenessProbe: {httpGet: {path: /health/live, port: 8000}}
