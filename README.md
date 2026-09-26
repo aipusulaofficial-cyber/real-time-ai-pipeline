@@ -1,29 +1,28 @@
 # Real-Time AI Pipeline
 
-**Principal-level reference implementation** focused on low-latency processing boundaries, backpressure-aware stages, deterministic failure semantics, and observability.
+A low-latency AI processing pipeline designed around bounded stages, backpressure-aware execution, deterministic failure semantics and operational visibility.
 
-## Engineering intent
-- Clear domain boundaries and replaceable infrastructure adapters
-- Explicit contracts, validation, and failure semantics
-- Deterministic tests with external dependencies isolated
-- Operational readiness through health checks, CI, and security validation
-- Architecture decisions documented so trade-offs are reviewable
+## Pipeline model
+```text
+ingest -> validate -> stage A -> stage B -> stage C -> output
+             |          |          |          |
+          contract   bounded    backpressure telemetry
+```
 
-## System design
-The repository is structured around a small set of explicit responsibilities rather than framework-driven coupling. Request/event handling, domain policy, infrastructure adapters, and operational concerns are kept separable so individual components can evolve without forcing a system-wide rewrite.
+## Core contracts
+- Inputs are validated before entering the processing graph.
+- Each stage has an explicit responsibility and bounded work.
+- Backpressure prevents downstream saturation from becoming unbounded memory or concurrency growth.
+- Failures remain attached to the stage that produced them.
+- Correlation context follows the item through the pipeline.
 
-## Quality bar
-- **Correctness:** contract and edge-case tests cover expected and failure paths
-- **Reliability:** bounded work, explicit timeouts/failures, and health signals where applicable
-- **Security:** least-privilege boundaries, input validation, and safe defaults
-- **Observability:** correlation/context propagation and actionable operational signals
-- **Delivery:** reproducible CI validation before changes are considered complete
+## Reliability
+Timeouts and bounded concurrency protect the runtime. Retry behavior is explicit so non-idempotent work is not repeated blindly.
 
-## Principal engineering contract
-See [docs/PRINCIPAL-ENGINEERING.md](docs/PRINCIPAL-ENGINEERING.md) for the reviewable engineering contract, NFRs, and change-safety checklist.
+## Verification
+Contract, edge-case and failure-path tests validate pipeline behavior. CI, production and security checks protect delivery.
 
-## Architecture & decisions
-See [ARCHITECTURE.md](ARCHITECTURE.md) and the ADRs directory for system boundaries, key trade-offs, and extension points.
+## Evidence
+[ARCHITECTURE.md](ARCHITECTURE.md) · [docs/PRINCIPAL-ENGINEERING.md](docs/PRINCIPAL-ENGINEERING.md) · [ADRs](ADRs/)
 
-## Engineering principle
-The goal is not to maximize framework complexity; it is to make important behavior **explicit, testable, observable, and replaceable**.
+This repository demonstrates a real streaming execution model rather than a diagram-only pipeline.
