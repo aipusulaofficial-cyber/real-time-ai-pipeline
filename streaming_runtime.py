@@ -20,7 +20,7 @@ class BoundedStream:
         while not self._closed or not self._queue.empty():
             try:
                 item = await asyncio.wait_for(self._queue.get(), timeout=0.25)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 continue
             try:
                 await handler(item)
