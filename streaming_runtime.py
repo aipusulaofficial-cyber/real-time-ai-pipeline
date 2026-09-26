@@ -8,10 +8,10 @@ class BoundedStream:
     def __init__(self, maxsize: int = 1024) -> None:
         if maxsize < 1:
             raise ValueError("maxsize must be positive")
-        self._queue = asyncio.Queue(maxsize=maxsize)
+        self._queue: asyncio.Queue[object] = asyncio.Queue(maxsize=maxsize)
         self._closed = False
 
-    async def publish(self, item) -> None:
+    async def publish(self, item: object) -> None:
         if self._closed:
             raise RuntimeError("stream is closed")
         await self._queue.put(item)
