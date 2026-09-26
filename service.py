@@ -1,5 +1,3 @@
-from typing import Any
-
 from fastapi import FastAPI, HTTPException, Request, Response
 from opentelemetry import trace
 from pydantic import BaseModel, Field
