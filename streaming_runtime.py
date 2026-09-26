@@ -4,21 +4,28 @@ from collections.abc import Awaitable, Callable
 
 class BoundedStream:
     """Async bounded stream with explicit backpressure and graceful shutdown."""
+
     def __init__(self, maxsize: int = 1024) -> None:
-        if maxsize < 1: raise ValueError("maxsize must be positive")
+        if maxsize < 1:
+            raise ValueError("maxsize must be positive")
         self._queue = asyncio.Queue(maxsize=maxsize)
         self._closed = False
 
     async def publish(self, item) -> None:
-        if self._closed: raise RuntimeError("stream is closed")
+        if self._closed:
+            raise RuntimeError("stream is closed")
         await self._queue.put(item)
 
     async def consume(self, handler: Callable[[object], Awaitable[None]]) -> None:
         while not self._closed or not self._queue.empty():
-            try: item = await asyncio.wait_for(self._queue.get(), timeout=0.25)
-            except asyncio.TimeoutError: continue
-            try: await handler(item)
-            finally: self._queue.task_done()
+            try:
+                item = await asyncio.wait_for(self._queue.get(), timeout=0.25)
+            except asyncio.TimeoutError:
+                continue
+            try:
+                await handler(item)
+            finally:
+                self._queue.task_done()
 
     async def drain(self) -> None:
         await self._queue.join()
