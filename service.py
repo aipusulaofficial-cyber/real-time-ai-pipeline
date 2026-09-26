@@ -14,9 +14,23 @@ tracer = trace.get_tracer("real-time-ai-pipeline")
 app = FastAPI(title="real-time-ai-pipeline", version="1.0.0")
 
 
+class SamplePayload(BaseModel):
+    key: str = Field(min_length=1, max_length=128)
+    value: float = Field(allow_inf_nan=False)
+    timestamp: float = Field(allow_inf_nan=False)
+
+
+class StreamPayload(BaseModel):
+    window_s: float = Field(default=60, gt=0, le=86_400, allow_inf_nan=False)
+    max_samples: int = Field(default=10_000, gt=0, le=10_000)
+    value: float = Field(default=0, allow_inf_nan=False)
+    timestamp: float = Field(default=0, allow_inf_nan=False)
+    samples: list[SamplePayload] | None = Field(default=None, max_length=10_000)
+
+
 class StreamRequest(BaseModel):
-    key: str
-    payload: dict[str, Any] = Field(default_factory=dict)
+    key: str = Field(min_length=1, max_length=128)
+    payload: StreamPayload = Field(default_factory=StreamPayload)
 
 
 @app.get("/health/live")
@@ -38,28 +52,22 @@ def handle(request: StreamRequest) -> dict[str, float | int | str]:
     with tracer.start_as_current_span("realtime.stream") as span:
         span.set_attribute("realtime.key", request.key)
         try:
-            window_s = float(request.payload.get("window_s", 60))
-            max_samples = int(request.payload.get("max_samples", 10_000))
-            raw_samples = request.payload.get("samples")
+            raw_samples = request.payload.samples
             if raw_samples is None:
                 raw_samples = [
-                    {
-                        "key": request.key,
-                        "value": request.payload.get("value", 0),
-                        "timestamp": request.payload.get("timestamp", 0),
-                    }
+                    SamplePayload(
+                        key=request.key,
+                        value=request.payload.value,
+                        timestamp=request.payload.timestamp,
+                    )
                 ]
-            if not isinstance(raw_samples, list):
-                raise TypeError("samples must be a list")
-            window = Window(window_s, max_samples=max_samples)
+            window = Window(request.payload.window_s, max_samples=request.payload.max_samples)
             for raw in raw_samples:
-                if not isinstance(raw, dict):
-                    raise TypeError("each sample must be an object")
                 window.add(
                     Sample(
-                        key=str(raw.get("key", request.key)),
-                        value=float(raw.get("value", 0)),
-                        timestamp=float(raw.get("timestamp", 0)),
+                        key=raw.key,
+                        value=raw.value,
+                        timestamp=raw.timestamp,
                     )
                 )
             return {
