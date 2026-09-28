@@ -23,3 +23,4 @@ def handle(request:StreamRequest,http_request:Request):
    return {"key":request.key,"window_size":len(window),"window_value":window.aggregate(request.key),"evidence":runtime_evidence(request_id=request_id,stage="realtime.stream",decision="ALLOW",started=started)}
   except (ValueError,TypeError,OverflowError) as exc:
    evidence=runtime_evidence(request_id=request_id,stage="realtime.stream",decision="FAIL",started=started,error=str(exc)); logger.warning("stream_request_rejected",extra={"error":str(exc)}); raise HTTPException(status_code=400,detail={"error":str(exc),"evidence":evidence}) from exc
+
