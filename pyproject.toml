@@ -15,4 +15,4 @@ dev = ["pytest-cov>=5,<7", "mypy>=1.13,<2", "pytest>=8","hypothesis>=6","ruff>=0
 pythonpath=["."]
 
 [tool.setuptools]
-py-modules=["service","pipeline_domain"]
+py-modules=["observability","pipeline_domain","realtime_pipeline","resilience","service","streaming_runtime"]
