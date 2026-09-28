@@ -10,7 +10,7 @@ class SamplePayload(BaseModel): key:str=Field(min_length=1,max_length=128); valu
 class StreamPayload(BaseModel): window_s:float=Field(default=60,gt=0,le=86_400,allow_inf_nan=False); max_samples:int=Field(default=10_000,gt=0,le=10_000); value:float=Field(default=0,allow_inf_nan=False); timestamp:float=Field(default=0,allow_inf_nan=False); samples:list[SamplePayload]|None=Field(default=None,max_length=10_000)
 class StreamRequest(BaseModel): key:str=Field(min_length=1,max_length=128); payload:StreamPayload=Field(default_factory=StreamPayload)
 @app.get("/health/live")
-def live(request:Request,response:Response): request_id=request.headers.get("x-request-id",""); response.headers["x-request-id"]=request_id; response.headers["x-correlation-id"]=request.headers.get("x-correlation-id",request_id); return {"status":"ok"}
+def live(request:Request,response:Response): request_id=request.headers.get("x-request-id",""); response.headers["x-request-id"]=request_id; response.headers["x-correlation-id"]=request.headers.get("x-correlation-id",request_id); response.headers["x-latency-ms"]="0"; return {"status":"ok"}
 @app.get("/health/ready")
 def ready(): return {"status":"ready"}
 @app.post("/v1/stream")
