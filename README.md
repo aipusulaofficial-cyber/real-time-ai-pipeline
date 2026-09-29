@@ -26,3 +26,6 @@ Contract, edge-case and failure-path tests validate pipeline behavior. CI, produ
 [ARCHITECTURE.md](ARCHITECTURE.md) · [docs/PRINCIPAL-ENGINEERING.md](docs/PRINCIPAL-ENGINEERING.md) · [ADRs](ADRs/)
 
 This repository demonstrates a real streaming execution model rather than a diagram-only pipeline.
+
+## Portfolio evidence
+[Portfolio evidence map](docs/PORTFOLIO_EVIDENCE.md) — executable proof, architecture mapping and reviewable CI evidence.
