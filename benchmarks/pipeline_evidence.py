@@ -1,7 +1,9 @@
+import json
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-import json
+
 from pipeline_domain import Sample, Window
 w=Window(10,max_samples=3)
 for s in [Sample("a",2,1),Sample("a",4,5),Sample("b",10,6)]: w.add(s)
