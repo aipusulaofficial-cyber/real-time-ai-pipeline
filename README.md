@@ -1,5 +1,10 @@
 # Real-Time AI Pipeline
 
+[![CI](https://github.com/aipusulaofficial-cyber/real-time-ai-pipeline/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/aipusulaofficial-cyber/real-time-ai-pipeline/actions/workflows/ci.yml)
+[![Production Tests](https://github.com/aipusulaofficial-cyber/real-time-ai-pipeline/actions/workflows/production-tests.yml/badge.svg?branch=main)](https://github.com/aipusulaofficial-cyber/real-time-ai-pipeline/actions/workflows/production-tests.yml)
+[![Security / SBOM](https://github.com/aipusulaofficial-cyber/real-time-ai-pipeline/actions/workflows/security-sbom.yml/badge.svg?branch=main)](https://github.com/aipusulaofficial-cyber/real-time-ai-pipeline/actions/workflows/security-sbom.yml)
+
+
 A low-latency AI processing pipeline designed around bounded stages, backpressure-aware execution, deterministic failure semantics and operational visibility.
 
 ## Pipeline model
