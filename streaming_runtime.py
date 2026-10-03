@@ -27,8 +27,13 @@ class BoundedStream:
             finally:
                 self._queue.task_done()
 
-    async def drain(self) -> None:
-        await self._queue.join()
+    async def drain(self, timeout: float | None = None) -> None:
+        if timeout is not None and timeout <= 0:
+            raise ValueError("drain timeout must be positive")
+        if timeout is None:
+            await self._queue.join()
+        else:
+            await asyncio.wait_for(self._queue.join(), timeout=timeout)
 
     def close(self) -> None:
         self._closed = True
