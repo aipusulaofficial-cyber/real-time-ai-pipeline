@@ -10,6 +10,7 @@ class BoundedStream:
             raise ValueError("maxsize must be positive")
         self._queue: asyncio.Queue[object] = asyncio.Queue(maxsize=maxsize)
         self._closed = False
+        self._failure: Exception | None = None
 
     async def publish(self, item: object) -> None:
         if self._closed:
@@ -24,6 +25,13 @@ class BoundedStream:
                 continue
             try:
                 await handler(item)
+            except Exception as exc:
+                self._failure = exc
+                self._closed = True
+                while not self._queue.empty():
+                    self._queue.get_nowait()
+                    self._queue.task_done()
+                raise
             finally:
                 self._queue.task_done()
 
@@ -34,6 +42,8 @@ class BoundedStream:
             await self._queue.join()
         else:
             await asyncio.wait_for(self._queue.join(), timeout=timeout)
+        if self._failure is not None:
+            raise RuntimeError("stream consumer failed") from self._failure
 
     def close(self) -> None:
         self._closed = True
